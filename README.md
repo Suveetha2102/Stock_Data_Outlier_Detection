@@ -3,8 +3,12 @@
 This project processes stock data from CSV files, selects random samples, and detects outliers using statistical methods.
 
 ### How to Use:
-1. Upload your CSV files to the Colab environment.
-2. Run the script to process the data and detect outliers.
+1. Open the LSE_Final.py file
+2. Upload in Google Colab
+3. Make sure you have the Stock Files and Directories in local
+4. On running the first function "process_uploaded_files" it will ask you to upload the file from local
+5. Upload any file
+6. On running the second function "detect_outliers" it will generate a final output file and download the final output file
 
 ### Files:
 - `your_script_name.py`: Main script to detect outliers.
