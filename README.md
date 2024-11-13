@@ -1,9 +1,10 @@
 # Stock Data Outlier Detection
 
 This project processes stock data from CSV files, selects random samples, and detects outliers using statistical methods.
+Python libraries like Numpy, Pandas, Matplotlib, Seaborn has been used here
 
 ### How to Use:
-1. Open the LSE_Final.py file
+1. Open the outlier_detection.py file
 2. Upload in Google Colab
 3. Make sure the Stock Files and Directories are saved in local
 4. On running the first function "process_uploaded_files" it will ask the user to upload the file from local
@@ -12,7 +13,7 @@ This project processes stock data from CSV files, selects random samples, and de
 7. Apart from that we have certain plots to understand the distribution
 
 ### Files:
-- `Distribution_Document_Final`: - Pdf File with distribution document
+- ``: - Pdf File with distribution document
 - `Connect_to_github_from_Colab`: If the user hasnt connected to github from colab, this is a reference file
 
 ### Outlier Detection:
