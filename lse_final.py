@@ -151,6 +151,7 @@ axes[0,1].set_title("KDE Plot for GSK Data") #Title for second subplot
 #2nd Row, 1st Column - Nasdaq : Plot KDE for TSLA Data
 sns.kdeplot(tsla, ax = axes[1,0])
 axes[1,0].set_title("KDE Plot for TSLA Data") #Title for third subplot
+axes[1,1].remove()
 
 #3rd Row, 1st Column - NYSE : Plot KDE for ASH Data
 sns.kdeplot(ash, ax = axes[2,0])
