@@ -12,8 +12,8 @@ This project processes stock data from CSV files, selects random samples, and de
 7. Apart from that we have certain plots to understand the distribution
 
 ### Files:
-- ``: Main script to detect outliers.
-- `sample_input.csv`: Example CSV data.
+- `Distribution_Document_Final`: - Pdf File with distribution document
+- `Connect_to_github_from_Colab`: If the user hasnt connected to github from colab, this is a reference file
 
 ### Outlier Detection:
 - Outliers are defined as data points that are more than 2 standard deviations from the mean of 30 randomly sampled data points.
