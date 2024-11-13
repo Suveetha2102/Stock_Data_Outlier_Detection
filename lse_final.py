@@ -11,6 +11,7 @@ Original file is located at
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 from google.colab import drive
 from google.colab import files
 import os
@@ -112,12 +113,54 @@ def detect_outliers(df):
   final_output = df2.to_csv("/content/Final_Output.csv", index=False)
   return final_output
 
-#Understand the distribution of Data
+process_uploaded_files()
+
+#Understand the distribution of Data for the sample taken
 df2 = pd.read_csv("/content/Input_to_2ndFunc.csv")
 #Draw a KDE Plot to Understand the Distribution
 sns.kdeplot(data = df2)
+plt.xlabel("Stock_Price_Values")
+plt.title("Distribution of Sample Data")
+plt.savefig("/content/kde_distribution_for_30 sample")
 
-process_uploaded_files()
+#Create Population Distribution plot for all Stock files
+
+#Read Data
+#Subplot1 - LSE --> FLTR,GSK
+fltr = pd.read_csv("/content/FLTR LSE.csv")
+gsk = pd.read_csv("/content/GSK LSE.csv")
+
+#Subplot2 - NASDAQ --> TSLA
+tsla = pd.read_csv("/content/TSLA.csv")
+
+#Subplot3 - NYSE --> ASH, NMR
+ash = pd.read_csv("/content/ASH.csv")
+nmr = pd.read_csv("/content/NMR.csv")
+
+#Create a 3*2 grid for subplots
+fig, axes = plt.subplots(3,2,figsize=(12,12))
+
+#1st Row, 1st Column - LSE : Plot KDEs for FLTR Data
+sns.kdeplot(fltr, ax = axes[0,0])
+axes[0,0].set_title("KDE Plot for FLTR Data") #Title for first subplot
+
+#1st Row, 2nd Column - LSE : Plot KDEs for GSK Data
+sns.kdeplot(gsk, ax = axes[0,1])
+axes[0,1].set_title("KDE Plot for GSK Data") #Title for second subplot
+
+#2nd Row, 1st Column - Nasdaq : Plot KDE for TSLA Data
+sns.kdeplot(tsla, ax = axes[1,0])
+axes[1,0].set_title("KDE Plot for TSLA Data") #Title for third subplot
+
+#3rd Row, 1st Column - NYSE : Plot KDE for ASH Data
+sns.kdeplot(ash, ax = axes[2,0])
+axes[2,0].set_title("KDE Plot for ASH Data") #Title for fourth subplot
+
+#3rd Row, 2nd Column - NYSE : Plot KDE for NMR Data
+sns.kdeplot(nmr, ax = axes[2,1])
+axes[2,1].set_title("KDE Plot for NMR Data") #Title for fifth subplot
+
+plt.savefig("/content/kde_distribution_for_population_data_all_stock_files")
 
 
 
