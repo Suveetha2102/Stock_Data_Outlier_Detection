@@ -21,101 +21,98 @@ import zipfile
 #process_uploaded_files create a new input file For function2 to detect the outliers
 
 def process_uploaded_files():
-  try:
-    #Upload files to Colab
+    input_2ndfunc = None
+    try:
+        # Upload files to Colab
         uploaded = files.upload()
+        
         # Create a temporary directory to hold the files
         directory_path = '/content/uploaded_files'
         if not os.path.exists(directory_path):
             os.makedirs(directory_path)
+        
         # Save the uploaded files to the directory
         for filename in uploaded.keys():
             file_path = os.path.join(directory_path, filename)
             with open(file_path, 'wb') as f:
                 f.write(uploaded[filename])
+        
         # Validate the directory and files
-        if not os.path.isdir(directory_path):
-            raise FileNotFoundError(f"Directory '{directory_path}' does not exist.")
-        print(f"Directory '{directory_path}' exists.")
-
-        # Get all files in the directory
         files_in_directory = [file for file in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, file))]
         if not files_in_directory:
             raise FileNotFoundError("No files found in the specified directory.")
+        
         print(f"{len(files_in_directory)} file(s) found in the directory.")
 
         # Process each file
         for file in files_in_directory:
             file_path = os.path.join(directory_path, file)
-            # Check if file is not empty
+            
+            # Check if file is empty or not in CSV format
             if os.path.getsize(file_path) == 0:
                 raise ValueError(f"The file '{file_path}' is empty.")
-
-            # Check if the file is in CSV format
             if not file_path.endswith('.csv'):
                 raise ValueError(f"The file '{file_path}' is not in CSV format.")
 
-            #Load the data
-            #Create Headers
+            # Read the CSV file
             headers = ["Stock_ID", "Timestamp", "Stock_Price_Value"]
+            df = pd.read_csv(file_path, names=headers, header=None)
 
-            #Read the csv File
-            df = pd.read_csv(file_path, names = headers, header = None)
-
-            # Check if file has at least 30 data points
+            # Ensure at least 30 data points
             if len(df) < 30:
                 raise ValueError(f"The file '{file_path}' does not have the required 30 data points.")
 
-            print(f"File '{file_path}' passed all checks and is ready for processing.")
+            # Randomly pick 30 rows
+            random_rows = df.sample(n=30, random_state=42)
 
-            #Randomly picking 30 values from given CSV, random state ensures the reporoducability
-            random_rows = df.sample(n=30)
+            # Convert sample data to CSV for next function
+            input_2ndfunc = "/content/Input_to_2ndFunc.csv"
+            random_rows.to_csv(input_2ndfunc, index=False)
 
-            #converting the output file into csv for the 2nd function to detect outliers
-            input_2ndfunc = random_rows.to_csv("/content/Input_to_2ndFunc.csv", index=False)
-
-            # Call detect_outliers function and pass the selected random_rows
+            # Call detect_outliers function on sampled data
             detect_outliers(random_rows)
+            print(f"Outlier detection completed for file '{file_path}'.")
 
-  except Exception as e:
+    except Exception as e:
         print(f"Error: {e}")
 
-  return input_2ndfunc
-
+    return input_2ndfunc
+    
+#Create another function to detedct the Outliers and generate a final output file in csv format
 def detect_outliers(df):
-  #Calculate Mean and Std Dev for Population (Complete Dataset)
-  mu = df['Stock_Price_Value'].mean()
-  sigma = df['Stock_Price_Value'].std()
+    try:
+        # Calculate population mean and standard deviation
+        mu = df['Stock_Price_Value'].mean()
+        sigma = df['Stock_Price_Value'].std()
 
-  #Detecting outliers
-  outliers_right = mu + (2*sigma)
-  outliers_left = mu - (2*sigma)
+        # Set thresholds for outliers
+        outliers_right = mu + (2 * sigma)
+        outliers_left = mu - (2 * sigma)
 
-  #Adding Actual Stock Price mean to the dataframe
-  df2['actual_stock_price_mean'] = round(mu,2)
+        # Detect outliers and add columns
+        df['actual_stock_price_mean'] = round(mu, 2)
+        df['Outliers_Found'] = np.where((df['Stock_Price_Value'] > outliers_right) | (df['Stock_Price_Value'] < outliers_left), 'Yes', 'No')
 
-  #Calculate if the given value is falling outside the 2 Std Dev Range and mark it as Outlier
-  df2['Outliers_Found'] = np.where((df2['Stock_Price_Value'] > outliers_right) | (df2['Stock_Price_Value'] < outliers_left), 'Yes', 'No')
+        # Calculate sample mean for 30 data points
+        sample_mean = df['Stock_Price_Value'].mean()
+        df['mean_of_30_data_points'] = round(sample_mean, 2)
 
-  #Calculate Mean for Sample (30 Data Points)
-  mu1 = df2['Stock_Price_Value'].mean()
+        # Calculate percentage deviation
+        df['%_ofDeviation'] = df.apply(lambda x: round(((x['Stock_Price_Value'] - mu) / mu) * 100, 2), axis=1)
 
-  #Adding Actual Stock Price mean to the dataframe
-  df2['mean_of_30_data_points'] = round(mu1,2)
+        # Export the final output to CSV
+        final_output = "/content/Final_Output.csv"
+        df.to_csv(final_output, index=False)
+        print("Final output with outliers and deviations saved successfully.")
+        return final_output
 
-  '''As per the CLT(Central Limit Theory), the population and sample mean is tend to be the same
-  as sample size increases'''
-
-  #Calculate the PercentageofDeviation
-  df2['%_ofDeviation'] = df2.apply(lambda x: round((((x['Stock_Price_Value'] - mu) / mu) * 100),2) , axis=1)
-
-  #Creating final output Values
-  final_output = df2.to_csv("/content/Final_Output.csv", index=False)
-  return final_output
-
+    except Exception as e:
+        print(f"Error in detecting outliers: {e}")
+        return None
+        
 process_uploaded_files()
 
-#Understand the distribution of Data for the sample taken
+#Understand the distribution of Data for the sample taken and the output is saved in .png format
 df2 = pd.read_csv("/content/Input_to_2ndFunc.csv")
 #Draw a KDE Plot to Understand the Distribution
 sns.kdeplot(data = df2)
