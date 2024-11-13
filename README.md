@@ -1,5 +1,3 @@
-# Stock_Data_Outlier_Detection
-
 # Stock Data Outlier Detection
 
 This project processes stock data from CSV files, selects random samples, and detects outliers using statistical methods.
